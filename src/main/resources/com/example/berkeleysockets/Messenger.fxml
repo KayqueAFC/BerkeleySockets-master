@@ -11,7 +11,7 @@
 
   <!-- Cabeçalho -->
   <top>
-    <Label text="Suporte Online" BorderPane.alignment="CENTER" styleClass="titulo-chat"/>
+    <Label text="Cliente Online" BorderPane.alignment="CENTER" styleClass="titulo-chat"/>
   </top>
 
   <!-- Área de mensagens -->

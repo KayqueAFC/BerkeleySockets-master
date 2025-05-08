@@ -68,7 +68,7 @@ public class Controller implements Initializable {
     private void enviarMensagem() {
         String mensagem = campoMensagem.getText().trim();
         if (!mensagem.isEmpty()) {
-            adicionarMensagem(mensagem, Pos.CENTER_RIGHT, "bubble-user");
+            adicionarMensagem(mensagem, Pos.CENTER_RIGHT, "bubble-right");
 
             if (server != null) {
                 server.enviarMensagemCliente(mensagem,null);
@@ -95,7 +95,7 @@ public class Controller implements Initializable {
             balao.maxWidthProperty().bind(scrollMensagens.widthProperty().multiply(0.75)); // Corrigido tamanho dinâmico
             balao.setPadding(new Insets(8));
 
-            Label remetente = new Label(posicao == Pos.CENTER_RIGHT ? "Você" : "Suporte");
+            Label remetente = new Label(posicao == Pos.CENTER_RIGHT ? "Você" : "Cliente");
             remetente.getStyleClass().addAll("sender-label",
                     posicao == Pos.CENTER_RIGHT ? "sender-client" : "sender-server");
 

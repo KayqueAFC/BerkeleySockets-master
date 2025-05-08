@@ -35,7 +35,7 @@
 }
 
 .bubble-left {
-    -fx-background-color: #f0f0f0;
+    -fx-background-color: #959c9b;
     -fx-background-radius: 15px 15px 15px 0;
     -fx-padding: 10px 15px;
     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 3, 0, 0, 1);
