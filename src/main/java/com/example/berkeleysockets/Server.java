@@ -103,7 +103,7 @@ public class Server {
                         System.err.println("[ERRO] Controller não inicializado.");
                     }
 
-                    // Passa remetente junto com a mensagem para evitar eco
+
                     server.enviarMensagemCliente(mensagemCliente, this);
                 }
             } catch (IOException e) {
