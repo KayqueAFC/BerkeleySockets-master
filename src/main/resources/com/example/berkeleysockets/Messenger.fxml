@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane fx:id="app_main" fx:controller="com.example.berkeleysockets.Controller"
+            prefHeight="500.0" prefWidth="400.0"
+            xmlns:fx="http://javafx.com/fxml" stylesheets="@chat-style.css">
+
+  <!-- Cabeçalho -->
+  <top>
+    <Label text="Suporte Online" BorderPane.alignment="CENTER" styleClass="titulo-chat"/>
+  </top>
+
+  <!-- Área de mensagens -->
+  <center>
+    <ScrollPane fx:id="scrollMensagens" fitToWidth="true" styleClass="scroll-pane">
+      <content>
+        <VBox fx:id="vboxMensagens" spacing="8" styleClass="mensagens-container"/>
+      </content>
+    </ScrollPane>
+  </center>
+
+  <!-- Área de input com TextArea -->
+  <bottom>
+    <HBox styleClass="input-container" alignment="CENTER_LEFT" spacing="10">
+      <TextArea fx:id="campoMensagem" styleClass="campo-texto"
+                HBox.hgrow="ALWAYS" promptText="Digite sua mensagem..."
+                wrapText="true" prefRowCount="1" maxHeight="100"/>
+      <Button fx:id="botaoEnviar" text="Enviar" styleClass="botao-enviar"
+              minWidth="80" prefWidth="80" maxWidth="80"/>
+    </HBox>
+  </bottom>
+
+</BorderPane>
