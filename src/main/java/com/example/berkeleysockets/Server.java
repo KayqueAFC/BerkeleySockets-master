@@ -1,7 +1,6 @@
 package com.example.berkeleysockets;
 
 import javafx.geometry.Pos;
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,7 +25,7 @@ public class Server {
                     Socket socket = serverSocket.accept();
                     System.out.println("Novo cliente conectado!");
 
-                    ClientHandler clientHandler = new ClientHandler(socket, controller);
+                    ClientHandler clientHandler = new ClientHandler(socket, this, controller);
                     clientHandlers.add(clientHandler);
 
                     new Thread(clientHandler).start();
@@ -40,13 +39,14 @@ public class Server {
         }).start();
     }
 
-    public void enviarMensagemCliente(String mensagem) {
+    public void enviarMensagemCliente(String mensagem, ClientHandler remetente) {
         for (ClientHandler clientHandler : clientHandlers) {
-            try {
-                clientHandler.enviarMensagem(mensagem);
-            } catch (IOException e) {
-                System.err.println("Erro ao enviar mensagem para cliente: " + e.getMessage());
-                clientHandlers.remove(clientHandler);
+            if (clientHandler != remetente) { // NÃO reenvia para quem enviou
+                try {
+                    clientHandler.enviarMensagem(mensagem);
+                } catch (IOException e) {
+                    System.err.println("Erro ao enviar mensagem para cliente: " + e.getMessage());
+                }
             }
         }
     }
@@ -69,10 +69,12 @@ public class Server {
         private BufferedReader bufferedReader;
         private BufferedWriter bufferedWriter;
         private Controller controller;
+        private Server server;
 
-        public ClientHandler(Socket socket, Controller controller) {
+        public ClientHandler(Socket socket, Server server, Controller controller) {
             try {
                 this.socket = socket;
+                this.server = server;
                 this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 this.controller = controller;
@@ -84,19 +86,30 @@ public class Server {
 
         @Override
         public void run() {
-            while (socket.isConnected()) {
-                try {
+            try {
+                while (socket.isConnected()) {
                     String mensagemCliente = bufferedReader.readLine();
                     if (mensagemCliente == null) {
+                        System.out.println("[DEBUG] Cliente desconectado, encerrando thread.");
                         break;
                     }
-                    controller.adicionarMensagem(mensagemCliente, Pos.CENTER_LEFT, "bubble-left");
-                    enviarMensagemCliente(mensagemCliente);
-                } catch (IOException e) {
-                    System.err.println("Cliente desconectado: " + e.getMessage());
-                    closeConnection();
-                    break;
+
+                    System.out.println("[DEBUG] Mensagem recebida: " + mensagemCliente);
+
+                    // Exibe mensagem no controlador
+                    if (controller != null) {
+                        controller.adicionarMensagem(mensagemCliente, Pos.CENTER_LEFT, "bubble-left");
+                    } else {
+                        System.err.println("[ERRO] Controller não inicializado.");
+                    }
+
+                    // Passa remetente junto com a mensagem para evitar eco
+                    server.enviarMensagemCliente(mensagemCliente, this);
                 }
+            } catch (IOException e) {
+                System.err.println("[ERRO] Cliente desconectado inesperadamente: " + e.getMessage());
+            } finally {
+                closeConnection();
             }
         }
 

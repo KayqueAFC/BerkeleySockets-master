@@ -36,9 +36,13 @@ public class Controller implements Initializable {
             showErrorAlert("Falha ao iniciar servidor: " + e.getMessage());
         }
 
-        // Configura auto-scroll
+        configurarInterface();
+    }
+
+    private void configurarInterface() {
+        // Auto-scroll: sempre rola para o final quando a altura muda
         vboxMensagens.heightProperty().addListener((obs, oldVal, newVal) ->
-                scrollMensagens.setVvalue(newVal.doubleValue())
+                scrollMensagens.setVvalue(1.0)
         );
 
         // Ajuste dinâmico da altura do campo de mensagem
@@ -49,25 +53,31 @@ public class Controller implements Initializable {
             });
         });
 
-        // Configura ações de envio
-        botaoEnviar.setOnAction(event -> enviarMensagem());
-
-        // Enviar mensagem ao pressionar Enter (correção do erro original)
+        // Enviar mensagem ao pressionar Enter
         campoMensagem.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
+                event.consume();  // Impede que ENTER insira nova linha
                 enviarMensagem();
-                event.consume(); // Evita que o Enter adicione nova linha
             }
         });
+
+        // Enviar mensagem ao clicar no botão
+        botaoEnviar.setOnAction(event -> enviarMensagem());
     }
 
     private void enviarMensagem() {
         String mensagem = campoMensagem.getText().trim();
         if (!mensagem.isEmpty()) {
-            adicionarMensagem(mensagem, Pos.CENTER_RIGHT, "bubble-right");
-            server.enviarMensagemCliente(mensagem);
+            adicionarMensagem(mensagem, Pos.CENTER_RIGHT, "bubble-user");
+
+            if (server != null) {
+                server.enviarMensagemCliente(mensagem,null);
+            } else {
+                showErrorAlert("Erro: servidor não inicializado!");
+            }
+
             campoMensagem.clear();
-            campoMensagem.setPrefHeight(40); // Reseta a altura após enviar
+            campoMensagem.setPrefHeight(40);
         }
     }
 
@@ -82,7 +92,7 @@ public class Controller implements Initializable {
 
             TextFlow balao = new TextFlow(texto);
             balao.getStyleClass().add(estilo);
-            balao.setMaxWidth(scrollMensagens.getWidth() * 0.7);
+            balao.maxWidthProperty().bind(scrollMensagens.widthProperty().multiply(0.75)); // Corrigido tamanho dinâmico
             balao.setPadding(new Insets(8));
 
             Label remetente = new Label(posicao == Pos.CENTER_RIGHT ? "Você" : "Suporte");
@@ -100,7 +110,7 @@ public class Controller implements Initializable {
     private void showErrorAlert(String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Erro");
+            alert.setTitle("Erro no Cliente");
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
